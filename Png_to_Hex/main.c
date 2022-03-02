@@ -1,4 +1,4 @@
-/*update 4.8*/
+/*update 4.9*/
 #include <stdio.h>
 #include "PngImage.h"
 #include "CommandLineHandler.h"
