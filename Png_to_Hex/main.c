@@ -21,7 +21,6 @@
 #define OUTPUT_MR_CAT "out/MrCat.txt"
 #define OUTPUT_BRIDGE "out/Bridge_2560x2160.txt"
 
-#define ALL_FLAGS "set:"
 #define INPUT_INDEX 1
 #define OUTPUT_INDEX 2
 //PROTOTYPES
