@@ -1,4 +1,4 @@
-/*update 4.6*/
+/*update 4.7*/
 #include <stdio.h>
 #include "PngImage.h"
 #include "CommandLineHandler.h"
@@ -53,8 +53,3 @@ static void printStrings(int argc, char *argv[]) {
         printf("%d. %s\n", i, argv[i]);
     }
 }
-
-
-
-
-
