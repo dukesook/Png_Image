@@ -152,6 +152,14 @@
     <ClInclude Include="stb_image_resize.h" />
     <ClInclude Include="stb_image_write.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="10x5_black.png" />
+    <Image Include="10x5_gradient.png" />
+    <Image Include="4x3_rows.png" />
+    <Image Include="8w_6h_rgb.png" />
+    <Image Include="8x6_columns.png" />
+    <Image Include="Bridge_2560x2160.png" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

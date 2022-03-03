@@ -48,4 +48,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="4x3_rows.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="8w_6h_rgb.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="8x6_columns.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="10x5_black.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="10x5_gradient.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Bridge_2560x2160.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>
