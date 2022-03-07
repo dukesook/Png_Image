@@ -2,7 +2,7 @@
 //source code: https://github.com/randy408/libspng/blob/v0.7.2/examples/example.c
 
 #include "spng.h"
-
+#include "png_to_hex.h"
 #include <inttypes.h>
 #include <stdio.h>
 
@@ -63,10 +63,8 @@ encode_error:
     return ret;
 }
 
-const char* color_type_str(enum spng_color_type color_type)
-{
-    switch (color_type)
-    {
+const char* color_type_str(enum spng_color_type color_type) {
+    switch (color_type) {
     case SPNG_COLOR_TYPE_GRAYSCALE: return "grayscale";
     case SPNG_COLOR_TYPE_TRUECOLOR: return "truecolor";
     case SPNG_COLOR_TYPE_INDEXED: return "indexed color";
@@ -75,31 +73,35 @@ const char* color_type_str(enum spng_color_type color_type)
     default: return "(invalid)";
     }
 }
+void printHeaderInfo(struct spng_ihdr ihdr) {
+    const char* color_name = color_type_str(ihdr.color_type);
 
-int pnt_to_hex(int argc, char** argv) {
+    printf("width: %u\n"
+        "height: %u\n"
+        "bit depth: %u\n"
+        "color type: %u - %s\n",
+        ihdr.width, ihdr.height, ihdr.bit_depth, ihdr.color_type, color_name);
+
+}
+
+int pnt_to_hex(PngImage_Arguments pngArgs) {
     FILE* png;
     int ret = 0;
     spng_ctx* ctx = NULL;
     unsigned char* image = NULL;
 
-    if (argc < 2) {
-        printf("ERROR: No input file\n");
-        goto error;
-    }
 
 #pragma warning(suppress : 4996)
-    png = fopen(argv[1], "rb");
+    png = fopen(pngArgs.input, "rb");
 
-    if (png == NULL)
-    {
-        printf("error opening input file %s\n", argv[1]);
+    if (png == NULL) {
+        printf("error opening input file %s\n", pngArgs.input);
         goto error;
     }
 
     ctx = spng_ctx_new(0);
 
-    if (ctx == NULL)
-    {
+    if (ctx == NULL) {
         printf("spng_ctx_new() failed\n");
         goto error;
     }
@@ -118,19 +120,13 @@ int pnt_to_hex(int argc, char** argv) {
     struct spng_ihdr ihdr;
     ret = spng_get_ihdr(ctx, &ihdr);
 
-    if (ret)
-    {
+    if (ret) {
         printf("spng_get_ihdr() error: %s\n", spng_strerror(ret));
         goto error;
     }
 
-    const char* color_name = color_type_str(ihdr.color_type);
 
-    printf("width: %u\n"
-        "height: %u\n"
-        "bit depth: %u\n"
-        "color type: %u - %s\n",
-        ihdr.width, ihdr.height, ihdr.bit_depth, ihdr.color_type, color_name);
+    printHeaderInfo(ihdr);
 
     printf("compression method: %u\n"
         "filter method: %u\n"
@@ -264,12 +260,12 @@ no_text:
     free(text);
 
     /* This example assumes a non-paletted image */
-    if (fmt == SPNG_FMT_PNG)
-    {
+    if (fmt == SPNG_FMT_PNG) {
         ret = encode_image(image, image_size, ihdr.width, ihdr.height, ihdr.color_type, ihdr.bit_depth);
     }
 
     //VARIABLES
+    const char* color_name = color_type_str(ihdr.color_type);
     int offset;
     int bytes_per_channel = ihdr.bit_depth == 16 ? 2 : 1;
     int channels = (color_name == "grayscale" ? 1 : 3);

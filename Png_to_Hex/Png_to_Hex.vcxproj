@@ -139,11 +139,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="commandLineHandler.c" />
+    <ClCompile Include="getopt.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="png_to_hex.c" />
     <ClCompile Include="spng.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="commandLineHandler.h" />
+    <ClInclude Include="getopt.h" />
     <ClInclude Include="png_to_hex.h" />
     <ClInclude Include="spng.h" />
   </ItemGroup>

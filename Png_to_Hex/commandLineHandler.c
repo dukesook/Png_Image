@@ -1,7 +1,8 @@
+#include "commandLineHandler.h"
 
-#include "CommandLineHandler.h"
-//#include "getopt.h"
-#include <unistd.h> //getopt, optarg, optind
+
+#include "getopt.h"
+//#include <unistd.h> //getopt, optarg, optind
 #include <ctype.h> //isprint
 
 #define INPUT_4x3_rows "input/4x3_rows.png"
@@ -15,9 +16,11 @@ static bool endsWith(char* word, char* desiredEnd) {
 
     if (wordLength <= desiredEndLength) {
         return false;
-    } else if (!strcmp(wordEnd, desiredEnd)) { //strcmp returns 0 if the two words are the same
+    }
+    else if (!strcmp(wordEnd, desiredEnd)) { //strcmp returns 0 if the two words are the same
         return true;
-    } else {
+    }
+    else {
         return false;
     }
 }
@@ -55,7 +58,7 @@ static char* generateOutputPath(char* input) {
     //ASSUMPTION - input is the path to a .png file
 
     //VERIFY LENGTH
-    int inputLength = (int) strlen(input);
+    int inputLength = (int)strlen(input);
     if (inputLength < 5) {
         printf("ERROR - Input Path: %s\n", input);
         printf(".....The filename is too short\n");
@@ -81,7 +84,8 @@ static void printPngArgs(PngImage_Arguments args) {
 
     if (args.input == NULL) {
         printf("input is NULL\n");
-    } else if (args.output == NULL) {
+    }
+    else if (args.output == NULL) {
         printf("output is NULL\n");
     }
 
@@ -90,7 +94,8 @@ static void printPngArgs(PngImage_Arguments args) {
     printf("   output:..........%s\n", args.output);
     if (args.packetSize == 0) {
         printf("   Packet Size:.....Not specified, default to image width\n");
-    } else {
+    }
+    else {
         printf("   Packet Size:.....%d\n", args.packetSize);
     }
     printf("   littleEndian:....%d\n", args.littleEndian);
@@ -111,35 +116,37 @@ static PngImage_Arguments extractArgs(int argc, char* argv[]) {
 
     int c;
     //SET OPTIONS
-    while ((c = getopt (argc, argv, "ets:")) != -1) {
+    while ((c = getopt(argc, argv, "ets:")) != -1) {
         switch (c) {
-            case 'e':
-                args.littleEndian = true;
-                break;
-            case 't':
-                args.leftShiftData = true;
-                break;
-            case 's':
-                args.packetSize = atoi(optarg);
-                break;
-            case '?':
-                if (optopt == 's') {
-                    fprintf(stderr, "Option -%s requires an argument.\n", optopt);
-                } else if (isprint(optopt)) {
-                    fprintf(stderr, "Unknown option `-%c'.\n", optopt);
-                } else {
-                    fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
-                }
-                exit(1);
-            default:
-                abort();
+        case 'e':
+            args.littleEndian = true;
+            break;
+        case 't':
+            args.leftShiftData = true;
+            break;
+        case 's':
+            args.packetSize = atoi(optarg);
+            break;
+        case '?':
+            if (optopt == 's') {
+                fprintf(stderr, "Option -%s requires an argument.\n", optopt);
+            }
+            else if (isprint(optopt)) {
+                fprintf(stderr, "Unknown option `-%c'.\n", optopt);
+            }
+            else {
+                fprintf(stderr, "Unknown option character `\\x%x'.\n", optopt);
+            }
+            exit(1);
+        default:
+            abort();
         }
     }
 
     //ARGUMENTS
     int remainingArgs = argc - optind;
     for (int i = 0; i < remainingArgs; i++, optind++) {
-//        printf("%d. argv[%d] = %s\n", i, optind, argv[optind]);
+        //        printf("%d. argv[%d] = %s\n", i, optind, argv[optind]);
         if (i == 0)
             args.input = argv[optind];
         else if (i == 1)
@@ -173,7 +180,8 @@ static void validateArgs(PngImage_Arguments* args) {
     //OUTPUT
     if (args->output == NULL) { //predict output if not specified
         args->output = generateOutputPath(args->input);
-    } else if (!endsWith(args->output, ".txt")) {
+    }
+    else if (!endsWith(args->output, ".txt")) {
         printf("ERROR - Output Path: %s\n", args->output);
         printf(".....The Output Path must have the .txt extension\n");
         printDocumentation();
@@ -192,7 +200,7 @@ static void validateArgs(PngImage_Arguments* args) {
 
 
 //HEADER FUNCTION
-PngImage_Arguments CommandLineHandler_handler(int argc, char* argv[]) {
+PngImage_Arguments CommandLineHandler_getArgs(int argc, char* argv[]) {
 
     //EXTRACT
     PngImage_Arguments args = extractArgs(argc, argv);

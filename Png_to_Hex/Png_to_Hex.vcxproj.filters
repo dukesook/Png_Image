@@ -27,12 +27,24 @@
     <ClCompile Include="png_to_hex.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="commandLineHandler.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="getopt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="spng.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="png_to_hex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="commandLineHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="getopt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
