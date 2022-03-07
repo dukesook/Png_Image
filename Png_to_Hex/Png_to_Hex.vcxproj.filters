@@ -13,59 +13,61 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\8_bit_images">
+      <UniqueIdentifier>{d7394930-28f8-4a97-aca7-1ded82dde314}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CommandLineHandler.c">
+    <ClCompile Include="spng.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PngImage.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="getopt.c">
+    <ClCompile Include="png_to_hex.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stb_image_write.h">
+    <ClInclude Include="spng.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="stb_image_resize.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="stb_image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PngImage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CommandLineHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="getopt.h">
+    <ClInclude Include="png_to_hex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="4x3_rows.png">
+    <Image Include="4x5.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="8w_6h_rgb.png">
+    <Image Include="5x2_grayscale_counter.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="8x6_columns.png">
+    <Image Include="4x3_rows_of_A.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="10x5_black.png">
-      <Filter>Resource Files</Filter>
+    <Image Include="8_bit_images\MrCat.png">
+      <Filter>Resource Files\8_bit_images</Filter>
     </Image>
-    <Image Include="10x5_gradient.png">
-      <Filter>Resource Files</Filter>
+    <Image Include="8_bit_images\8w_6h_columns.png">
+      <Filter>Resource Files\8_bit_images</Filter>
     </Image>
-    <Image Include="Bridge_2560x2160.png">
-      <Filter>Resource Files</Filter>
+    <Image Include="8_bit_images\8w_6h_rgb.png">
+      <Filter>Resource Files\8_bit_images</Filter>
     </Image>
+    <Image Include="8_bit_images\10w_5h_black.png">
+      <Filter>Resource Files\8_bit_images</Filter>
+    </Image>
+    <Image Include="8_bit_images\10w_5h_gradient.png">
+      <Filter>Resource Files\8_bit_images</Filter>
+    </Image>
+    <Image Include="8_bit_images\Bridge_2560x2160.png">
+      <Filter>Resource Files\8_bit_images</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="notes.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

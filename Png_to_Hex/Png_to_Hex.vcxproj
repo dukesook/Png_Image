@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{7ed90585-b6f4-45da-9966-2a6ec10aaa38}</ProjectGuid>
+    <ProjectGuid>{23dde8ca-d702-4a68-b4bb-43e2dde51c88}</ProjectGuid>
     <RootNamespace>PngtoHex</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -139,26 +139,27 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CommandLineHandler.c" />
-    <ClCompile Include="getopt.c" />
     <ClCompile Include="main.c" />
-    <ClCompile Include="PngImage.c" />
+    <ClCompile Include="png_to_hex.c" />
+    <ClCompile Include="spng.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CommandLineHandler.h" />
-    <ClInclude Include="getopt.h" />
-    <ClInclude Include="PngImage.h" />
-    <ClInclude Include="stb_image.h" />
-    <ClInclude Include="stb_image_resize.h" />
-    <ClInclude Include="stb_image_write.h" />
+    <ClInclude Include="png_to_hex.h" />
+    <ClInclude Include="spng.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="10x5_black.png" />
-    <Image Include="10x5_gradient.png" />
-    <Image Include="4x3_rows.png" />
-    <Image Include="8w_6h_rgb.png" />
-    <Image Include="8x6_columns.png" />
-    <Image Include="Bridge_2560x2160.png" />
+    <Image Include="4x3_rows_of_A.png" />
+    <Image Include="4x5.png" />
+    <Image Include="5x2_grayscale_counter.png" />
+    <Image Include="8_bit_images\10w_5h_black.png" />
+    <Image Include="8_bit_images\10w_5h_gradient.png" />
+    <Image Include="8_bit_images\8w_6h_columns.png" />
+    <Image Include="8_bit_images\8w_6h_rgb.png" />
+    <Image Include="8_bit_images\Bridge_2560x2160.png" />
+    <Image Include="8_bit_images\MrCat.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="notes.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
