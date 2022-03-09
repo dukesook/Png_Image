@@ -152,7 +152,6 @@
     <ClInclude Include="spng.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="4x3_rows_of_A.png" />
     <Image Include="4x5.png" />
     <Image Include="5x2_grayscale_counter.png" />
     <Image Include="8_bit_images\10w_5h_black.png" />

@@ -6,35 +6,64 @@
 //#include <inttypes.h>
 #include <stdio.h>
 
+//COLOR
+static const char* color_type_str(enum spng_color_type color_type) {
+    switch (color_type) {
+    case SPNG_COLOR_TYPE_GRAYSCALE: return "grayscale";
+    case SPNG_COLOR_TYPE_TRUECOLOR: return "truecolor";
+    case SPNG_COLOR_TYPE_INDEXED: return "indexed color";
+    case SPNG_COLOR_TYPE_GRAYSCALE_ALPHA: return "grayscale with alpha";
+    case SPNG_COLOR_TYPE_TRUECOLOR_ALPHA: return "truecolor with alpha";
+    default: return "(invalid)";
+    }
+}
+static int getFormat(struct spng_ihdr ihdr) {
+
+    /* Output format, does not depend on source PNG format except for
+    SPNG_FMT_PNG, which is the PNG's format in host-endian or
+    big-endian for SPNG_FMT_RAW.
+    Note that for these two formats <8-bit images are left byte-packed */
+    int fmt = SPNG_FMT_PNG;
+
+    /* With SPNG_FMT_PNG indexed color images are output as palette indices,
+       pick another format to expand them. */
+    if (ihdr.color_type == SPNG_COLOR_TYPE_INDEXED)
+        fmt = SPNG_FMT_RGB8;
+
+    return fmt;
+}
 static unsigned int getChannelCount(uint8_t color_type) {
     //ihdr.color_type
     switch (color_type) {
-        case SPNG_COLOR_TYPE_GRAYSCALE: return 1;
-        case SPNG_COLOR_TYPE_TRUECOLOR: return 3;
-        case SPNG_COLOR_TYPE_INDEXED: 
-            printf("ERROR - Unhandled image: indexed image\n");
-            exit(1);
-        case SPNG_COLOR_TYPE_GRAYSCALE_ALPHA: return 2;
-        case SPNG_COLOR_TYPE_TRUECOLOR_ALPHA: return 4;
-        default:
-            printf("ERROR - Unhandled color_type: %x\n", color_type);
-            exit(1);
-    }
-}static char* getColorType(uint8_t color_type) {
-    //ihdr.color_type
-    switch (color_type) {
-        case SPNG_COLOR_TYPE_GRAYSCALE: return "grayscale_noAlpha";
-        case SPNG_COLOR_TYPE_TRUECOLOR: return "RGB_noAlpha";
-        case SPNG_COLOR_TYPE_INDEXED: 
-            printf("ERROR - Unhandled image: indexed image\n");
-            exit(1);
-        case SPNG_COLOR_TYPE_GRAYSCALE_ALPHA: return "grayscale_Alpha";
-        case SPNG_COLOR_TYPE_TRUECOLOR_ALPHA: return "RGP_ALPHA";
-        default:
-            printf("ERROR - Unhandled color_type: %x\n", color_type);
-            exit(1);
+    case SPNG_COLOR_TYPE_GRAYSCALE: return 1;
+    case SPNG_COLOR_TYPE_TRUECOLOR: return 3;
+    case SPNG_COLOR_TYPE_INDEXED:
+        printf("ERROR - Unhandled image: indexed image\n");
+        exit(1);
+    case SPNG_COLOR_TYPE_GRAYSCALE_ALPHA: return 2;
+    case SPNG_COLOR_TYPE_TRUECOLOR_ALPHA: return 4;
+    default:
+        printf("ERROR - Unhandled color_type: %x\n", color_type);
+        exit(1);
     }
 }
+static char* getColorType(uint8_t color_type) {
+    //ihdr.color_type
+    switch (color_type) {
+    case SPNG_COLOR_TYPE_GRAYSCALE: return "grayscale_noAlpha";
+    case SPNG_COLOR_TYPE_TRUECOLOR: return "RGB_noAlpha";
+    case SPNG_COLOR_TYPE_INDEXED:
+        printf("ERROR - Unhandled image: indexed image\n");
+        exit(1);
+    case SPNG_COLOR_TYPE_GRAYSCALE_ALPHA: return "grayscale_Alpha";
+    case SPNG_COLOR_TYPE_TRUECOLOR_ALPHA: return "RGP_ALPHA";
+    default:
+        printf("ERROR - Unhandled color_type: %x\n", color_type);
+        exit(1);
+    }
+}
+
+//SPNG FUNCTIONS
 static int encode_image(void* image, size_t length, uint32_t width, uint32_t height, enum spng_color_type color_type, int bit_depth) {
     int fmt;
     int ret = 0;
@@ -91,16 +120,6 @@ encode_error:
 
     return ret;
 }
-static const char* color_type_str(enum spng_color_type color_type) {
-    switch (color_type) {
-        case SPNG_COLOR_TYPE_GRAYSCALE: return "grayscale";
-        case SPNG_COLOR_TYPE_TRUECOLOR: return "truecolor";
-        case SPNG_COLOR_TYPE_INDEXED: return "indexed color";
-        case SPNG_COLOR_TYPE_GRAYSCALE_ALPHA: return "grayscale with alpha";
-        case SPNG_COLOR_TYPE_TRUECOLOR_ALPHA: return "truecolor with alpha";
-        default: return "(invalid)";
-    }
-}
 static spng_ctx* init_context() {
     spng_ctx* ctx = NULL;
 
@@ -119,17 +138,6 @@ static spng_ctx* init_context() {
     spng_set_chunk_limits(ctx, limit, limit);
 
     return ctx;
-}
-static FILE* getFile(char* inputPath) {
-    FILE* input_fp;
-    #pragma warning(suppress : 4996) //should use fopen_s() instead
-    input_fp = fopen(inputPath, "rb");
-
-    if (input_fp == NULL) {
-        printf("error opening input file %s\n", inputPath);
-        exit(1);
-    }
-    return input_fp;
 }
 static struct spng_ihdr getHeader(spng_ctx* ctx) {
     struct spng_ihdr ihdr;
@@ -168,21 +176,6 @@ static unsigned int getImageSize(spng_ctx* ctx, int fmt) {
 
     return (unsigned int) image_size;
 
-}
-static int getFormat(struct spng_ihdr ihdr) {
-
-    /* Output format, does not depend on source PNG format except for
-    SPNG_FMT_PNG, which is the PNG's format in host-endian or
-    big-endian for SPNG_FMT_RAW.
-    Note that for these two formats <8-bit images are left byte-packed */
-    int fmt = SPNG_FMT_PNG;
-
-    /* With SPNG_FMT_PNG indexed color images are output as palette indices,
-       pick another format to expand them. */
-    if (ihdr.color_type == SPNG_COLOR_TYPE_INDEXED)
-        fmt = SPNG_FMT_RGB8;
-
-    return fmt;
 }
 static void decodeImageSize(spng_ctx* ctx, int fmt, size_t* image_size) {
     int ret = spng_decoded_image_size(ctx, fmt, image_size);
@@ -228,7 +221,26 @@ if(ret)
             printf("last row: %u\n", row_info.row_num);
     }
 }
+static void printHeader(struct spng_ihdr ihdr) {
+    printf("META DATA\n");
+    printf("   Width:      %u\n", ihdr.width);
+    printf("   Height:     %u\n", ihdr.height);
+    printf("   Bit Depth:  %u\n", ihdr.bit_depth);
+    printf("   Color Type: %u\n", ihdr.color_type);
+}
 
+//PNG OPERATIONS
+static FILE* getFile(char* inputPath) {
+    FILE* input_fp;
+#pragma warning(suppress : 4996) //should use fopen_s() instead
+    input_fp = fopen(inputPath, "rb");
+
+    if (input_fp == NULL) {
+        printf("error opening input file %s\n", inputPath);
+        exit(1);
+    }
+    return input_fp;
+}
 static PngImage removeAlphaChannel(PngImage png) {
 
     //VARIABLES
@@ -323,17 +335,10 @@ static PngImage PngImage_toGray(PngImage png) {
     png_gray.channels = gray_channels;
     printf("   -Converted to Gray-Scale\n");
     return png_gray;
-
-
-    /*
-    unsigned int image_size_pixels;//Width * Height 
-    unsigned int image_size_bytes; //Width * Height * bytes_per_pixel
-    unsigned int bytes_per_channel;
-    char* color_type;
-    unsigned int channels;
-    */
 }
 static PngImage readImage(PngImage png) {
+
+    printf("READ IMAGE: \n");
 
     //GET FILE
     FILE* png_fp = getFile(png.input);
@@ -346,7 +351,9 @@ static PngImage readImage(PngImage png) {
 
     //HEADER INFO
     struct spng_ihdr ihdr = getHeader(ctx);
-    //printHeaderInfo(ihdr);
+
+    printHeader(ihdr);
+
     int fmt = getFormat(ihdr);
     size_t  imageSizeBytes = getImageSize(ctx, fmt);
     unsigned int  image_width_bytes = imageSizeBytes / ihdr.height;
@@ -373,94 +380,66 @@ static PngImage readImage(PngImage png) {
     size_t packetSize_pixels = png.packetSize == 0 ? png.width_pixels : png.packetSize;
     png.packetSize = packetSize_pixels;
 
+    printf("   -Image read successful\n");
+
     return png;
 }
 
-//OUTPUT
+//TO TXT
 static void writeByte(uint8_t x, FILE* output) {
     fprintf(output, "%02x ", x);
     fprintf(stdout, "%02x ", x);
 }
-
-//UNUSED
-static void writePacket(PngImage png, unsigned int* remainingPixels, unsigned char* byte) {
+static void writeSinglePacket(unsigned int* remainingPixels, FILE* output_fp, unsigned char** byte, unsigned int bytes_per_channel, unsigned int packetSize_pixels) {
     
-    FILE* output = png.output;
-    unsigned int packetSize_pixels = png.packetSize;
-
-
     for (int i = 0; i < packetSize_pixels; i++) {
-        uint8_t x = (uint8_t) * byte;
-        writeByte(x, output);
-        byte++;
-        if (png.bytes_per_channel == 2) {
-            writeByte(*byte, output);
-            byte++;
+        writeByte(**byte, output_fp);
+        (*byte)++;
+        if (bytes_per_channel == 2) {
+            writeByte(**byte, output_fp);
+            (*byte)++;
         }
-        (* remainingPixels)--;
+        (*remainingPixels)--;
     }
-    fprintf(output, "\n");
+
+    fprintf(output_fp, "\n");
     fprintf(stdout, "\n");
 }
-
 static void png_to_txt(PngImage png) {
 
-    printf("png_to_txt()\n");
-
     //VARIABLES
-    size_t packetSize_pixels = png.packetSize;
-    size_t packetSize_bytes = packetSize_pixels * png.bytes_per_channel;
-    FILE* output;
+    unsigned int packetSize_pixels = png.packetSize;
+    unsigned int bytes_per_channel = png.bytes_per_channel;
+    unsigned int packetSize_bytes = packetSize_pixels * bytes_per_channel;
     unsigned int width = png.width_pixels;
     unsigned int height = png.height_pixels;
     unsigned int remainingPixels = (width * height);
-    unsigned char* byte = png.data;
+    unsigned char* baseAddress = png.data;
+    unsigned char* currentByte = png.data;
+    FILE* output_fp;
 
-    fopen_s(&output, png.output, "w");
-    if (output == NULL) {
+    fopen_s(&output_fp, png.output, "w");
+    if (output_fp == NULL) {
         printf("ERROR - failed to open: %s\n", png.output);
         exit(1);
     }
       
     while (packetSize_pixels <= remainingPixels) {
-        //PRINT A PACKET
-        //writePacket(png, &remainingPixels, byte);
-        for (int i = 0; i < packetSize_pixels; i++) {
-            writeByte(*byte, output);
-            byte++;
-            if (png.bytes_per_channel == 2) {
-                writeByte(*byte, output);
-                byte++;
-            }
-            remainingPixels--;
-        }
-        fprintf(output, "\n");
-        fprintf(stdout, "\n");
+        writeSinglePacket(&remainingPixels, output_fp, &currentByte, bytes_per_channel, packetSize_pixels);
     }
      
     //LAST PACKET - remaining pixels
-    for (unsigned int i = 0; i < remainingPixels; i++) {
-        writeByte(*byte, output);
-        byte++;
+    if (remainingPixels > 0) {
+        writeSinglePacket(&remainingPixels, output_fp, &currentByte, bytes_per_channel, remainingPixels);
     }
-    fprintf(output, "\n");
+    //for (unsigned int i = 0; i < remainingPixels; i++) {
+    //    writeByte(*currentByte, output_fp);
+    //    currentByte++;
+    //}
+    //fprintf(output_fp, "\n");
 }
-static void printHeaderInfo(struct spng_ihdr ihdr) {
-    const char* color_name = color_type_str(ihdr.color_type);
 
-    printf("META DATA\n");
-    printf("   Width: %u\n"
-        "   Height: %u\n"
-        "   Bit Depth: %u\n"
-        "   Color Type: %u - %s\n",
-        ihdr.width, ihdr.height, ihdr.bit_depth, ihdr.color_type, color_name);
-
-    //printf("compression method: %u\n"
-    //    "filter method: %u\n"
-    //    "interlace method: %u\n",
-    //    ihdr.compression_method, ihdr.filter_method, ihdr.interlace_method);
-
-}
+//STDOUT
 static void printImage(PngImage png) {
     
     //VARIABLES
@@ -519,9 +498,7 @@ int png_to_hex(PngImage png) {
     
     //GET IMAGE
     png = readImage(png);
-    
-    //PRINT IMAGE
-    //printImage(png);
+    printImage(png);
 
     //REMOVE ALPHA CHANNEL
     png = removeAlphaChannel(png);
@@ -530,8 +507,8 @@ int png_to_hex(PngImage png) {
     PngImage png_gray = PngImage_toGray(png);
 
     //PRINT IMAGE
-    //printImage(png_gray);
-
+    printImage(png_gray);
+     
     //WRITE
     png_to_txt(png_gray);
 

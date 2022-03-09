@@ -55,9 +55,6 @@
     <Image Include="5x2_grayscale_counter.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="4x3_rows_of_A.png">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="8_bit_images\MrCat.png">
       <Filter>Resource Files\8_bit_images</Filter>
     </Image>
