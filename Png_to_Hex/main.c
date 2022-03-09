@@ -8,7 +8,7 @@ int main(int argc, char** argv) {
 
 	PngImage arguments;
 	arguments = CommandLineHandler_getArgs(argc, argv);
-	pnt_to_hex(arguments);
+	png_to_hex(arguments);
 
 
 	return 0;

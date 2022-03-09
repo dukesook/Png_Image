@@ -18,4 +18,4 @@ typedef struct {
     unsigned int channels;
 } PngImage;
 
-int pnt_to_hex(PngImage pngArguments);
+int png_to_hex(PngImage pngArguments);
