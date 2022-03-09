@@ -80,7 +80,7 @@ static char* generateOutputPath(char* input) {
 
 
 //HELPER FUNCTIONS
-static void printPngArgs(PngImage_Arguments args) {
+static void printPngArgs(PngImage args) {
 
     if (args.input == NULL) {
         printf("input is NULL\n");
@@ -101,8 +101,8 @@ static void printPngArgs(PngImage_Arguments args) {
     printf("   littleEndian:....%d\n", args.littleEndian);
     printf("   leftShiftData:...%d\n", args.leftShiftData);
 }
-static PngImage_Arguments initArgs() {
-    PngImage_Arguments args;
+static PngImage initArgs() {
+    PngImage args;
     args.input = NULL;
     args.output = NULL;
     args.packetSize = 0;
@@ -110,9 +110,9 @@ static PngImage_Arguments initArgs() {
     args.leftShiftData = false;
     return args;
 }
-static PngImage_Arguments extractArgs(int argc, char* argv[]) {
+static PngImage extractArgs(int argc, char* argv[]) {
     //VARIABLES
-    PngImage_Arguments args = initArgs();
+    PngImage args = initArgs();
 
     int c;
     //SET OPTIONS
@@ -162,7 +162,7 @@ static PngImage_Arguments extractArgs(int argc, char* argv[]) {
     }
     return args;
 }
-static void validateArgs(PngImage_Arguments* args) {
+static void validateArgs(PngImage* args) {
 
     //INPUT - must be a png
     if (args->input == NULL) {
@@ -200,10 +200,10 @@ static void validateArgs(PngImage_Arguments* args) {
 
 
 //HEADER FUNCTION
-PngImage_Arguments CommandLineHandler_getArgs(int argc, char* argv[]) {
+PngImage CommandLineHandler_getArgs(int argc, char* argv[]) {
 
     //EXTRACT
-    PngImage_Arguments args = extractArgs(argc, argv);
+    PngImage args = extractArgs(argc, argv);
 
     //VALIDATE
     validateArgs(&args);

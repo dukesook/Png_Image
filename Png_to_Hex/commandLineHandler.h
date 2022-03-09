@@ -5,4 +5,4 @@
 #include <stdlib.h>
 #include "png_to_hex.h"
 
-PngImage_Arguments CommandLineHandler_getArgs(int argc, char* argv[]);
+PngImage CommandLineHandler_getArgs(int argc, char* argv[]);

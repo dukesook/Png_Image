@@ -4,9 +4,9 @@
 #include "commandLineHandler.h"
 
 int main(int argc, char** argv) {
-	printf("test\n");
+	printf("Png To Hex\n");
 
-	PngImage_Arguments arguments;
+	PngImage arguments;
 	arguments = CommandLineHandler_getArgs(argc, argv);
 	pnt_to_hex(arguments);
 
