@@ -32,15 +32,14 @@ static void printDocumentation() {
     //printf("\t-e:    Little Endian\n");
     //printf("\t-t:    Left Shift Data by 1 byte. Useful if the input image data is 1 byte and 2 byte data is desired\n");
 
-    printf("DEFAULT VALUES:\n");
-    printf("\tPacket Size: Image width\n");
-    printf("\tEndianness: Big Endian\n");
+    //printf("DEFAULT VALUES:\n");
+    //printf("\tPacket Size: Image width\n");
+    //printf("\tEndianness: Big Endian\n");
 
     printf("EXAMPLES:\n");
     printf("\tSimple............HexToIcd.exe  input/MrCat.png\n");
     printf("\tSpecify output....HexToIcd.exe  input/MrCat.png  output/MrCat.txt\n");
     printf("\tSet Packet Size...HexToIcd.exe  -s  128 input/MrCat.png  output/MrCat.txt\n");
-    printf("\tLittle Endian.....HexToIcd.exe  -e  input/MrCat.png  output/MrCat.txt\n");
 
     printf("CONSTRAINTS:\n");
     printf("\t-The input image MUST be a .png file.\n");
