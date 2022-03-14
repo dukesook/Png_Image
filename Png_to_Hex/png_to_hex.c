@@ -222,11 +222,12 @@ if(ret)
     }
 }
 static void printHeader(struct spng_ihdr ihdr) {
-    printf("META DATA\n");
-    printf("   Width:      %u\n", ihdr.width);
-    printf("   Height:     %u\n", ihdr.height);
-    printf("   Bit Depth:  %u\n", ihdr.bit_depth);
-    printf("   Color Type: %u\n", ihdr.color_type);
+    char* color_type = color_type_str(ihdr.color_type);
+
+    printf("   Width............%u\n", ihdr.width);
+    printf("   Height...........%u\n", ihdr.height);
+    printf("   Bit Depth........%u\n", ihdr.bit_depth);
+    printf("   Color Type.......%s\n", color_type);
 }
 
 //PNG OPERATIONS
@@ -236,7 +237,7 @@ static FILE* getFile(char* inputPath) {
     input_fp = fopen(inputPath, "rb");
 
     if (input_fp == NULL) {
-        printf("error opening input file %s\n", inputPath);
+        printf("ERROR - file not found: %s\n", inputPath);
         exit(1);
     }
     return input_fp;
@@ -257,34 +258,39 @@ static PngImage removeAlphaChannel(PngImage png) {
         printf("removeAlphaChannel(): channel count unhandled: %d\n", png.channels);
         exit(1);
     }
-
-    //ALLOCATE NEW IMAGE MEMORY
-    unsigned char* new_img = malloc(new_img_size);
-    if (new_img == NULL) {
-        printf("removeAlphaChannel(): Failed to allocate memory");
+    else {
+        printf("Alpha Channel Detected\n");
+        printf("ERROR - Alpha channel handling have not yet been implemented\n");
         exit(1);
     }
 
-    unsigned char red, green, blue, alpha;
-    unsigned char* p, * np;
-    for (p = png.data, np = new_img; p != png.data + img_size; p += png.channels, np += new_channels) {
-        red = *p;
-        green = *(p + 1);
-        blue = *(p + 2);
-        alpha = *(p + 3);
+    ////ALLOCATE NEW IMAGE MEMORY
+    //unsigned char* new_img = malloc(new_img_size);
+    //if (new_img == NULL) {
+    //    printf("removeAlphaChannel(): Failed to allocate memory");
+    //    exit(1);
+    //}
 
-        np[0] = red;
-        np[1] = green;
-        np[2] = blue;
-    }
+    //unsigned char red, green, blue, alpha;
+    //unsigned char* p, * np;
+    //for (p = png.data, np = new_img; p != png.data + img_size; p += png.channels, np += new_channels) {
+    //    red = *p;
+    //    green = *(p + 1);
+    //    blue = *(p + 2);
+    //    alpha = *(p + 3);
+
+    //    np[0] = red;
+    //    np[1] = green;
+    //    np[2] = blue;
+    //}
 
     PngImage newPng;
-    newPng.data = new_img;
-    newPng.width_pixels = png.width_pixels;
-    newPng.height_pixels = png.height_pixels;
-    newPng.channels = new_channels;
+    //newPng.data = new_img;
+    //newPng.width_pixels = png.width_pixels;
+    //newPng.height_pixels = png.height_pixels;
+    //newPng.channels = new_channels;
 
-    printf("   -Alpha Channel Removed\n");
+    //printf("   -Alpha Channel Removed\n");
     return newPng;
 
 }
@@ -338,7 +344,7 @@ static PngImage PngImage_toGray(PngImage png) {
 }
 static PngImage readImage(PngImage png) {
 
-    printf("READ IMAGE: \n");
+    printf("READ IMAGE \n");
 
     //GET FILE
     FILE* png_fp = getFile(png.input);
@@ -351,9 +357,6 @@ static PngImage readImage(PngImage png) {
 
     //HEADER INFO
     struct spng_ihdr ihdr = getHeader(ctx);
-
-    printHeader(ihdr);
-
     int fmt = getFormat(ihdr);
     size_t  imageSizeBytes = getImageSize(ctx, fmt);
     unsigned int  image_width_bytes = imageSizeBytes / ihdr.height;
@@ -380,7 +383,8 @@ static PngImage readImage(PngImage png) {
     size_t packetSize_pixels = png.packetSize == 0 ? png.width_pixels : png.packetSize;
     png.packetSize = packetSize_pixels;
 
-    printf("   -Image read successful\n");
+    printf("   Image read successful\n");
+    printHeader(ihdr);
 
     return png;
 }
@@ -388,7 +392,6 @@ static PngImage readImage(PngImage png) {
 //TO TXT
 static void writeByte(uint8_t x, FILE* output) {
     fprintf(output, "%02x ", x);
-    fprintf(stdout, "%02x ", x);
 }
 static void writeSinglePacket(unsigned int* remainingPixels, FILE* output_fp, unsigned char** byte, unsigned int bytes_per_channel, unsigned int packetSize_pixels) {
     
@@ -403,7 +406,6 @@ static void writeSinglePacket(unsigned int* remainingPixels, FILE* output_fp, un
     }
 
     fprintf(output_fp, "\n");
-    fprintf(stdout, "\n");
 }
 static void png_to_txt(PngImage png) {
 
@@ -432,11 +434,8 @@ static void png_to_txt(PngImage png) {
     if (remainingPixels > 0) {
         writeSinglePacket(&remainingPixels, output_fp, &currentByte, bytes_per_channel, remainingPixels);
     }
-    //for (unsigned int i = 0; i < remainingPixels; i++) {
-    //    writeByte(*currentByte, output_fp);
-    //    currentByte++;
-    //}
-    //fprintf(output_fp, "\n");
+
+    printf("SUCCESS\n   .png converted to .txt\n");
 }
 
 //STDOUT
@@ -498,16 +497,14 @@ int png_to_hex(PngImage png) {
     
     //GET IMAGE
     png = readImage(png);
-    printImage(png);
+    //printImage(png);
 
     //REMOVE ALPHA CHANNEL
     png = removeAlphaChannel(png);
 
     //CONVERT TO GRAYSCALE
     PngImage png_gray = PngImage_toGray(png);
-
-    //PRINT IMAGE
-    printImage(png_gray);
+    //printImage(png_gray);
      
     //WRITE
     png_to_txt(png_gray);
@@ -519,3 +516,24 @@ int png_to_hex(PngImage png) {
 
 //spng_ctx_free(ctx);
 //free(image);
+
+
+/*zlib
+* spng.c has a dependency on zlib.
+* The source code won't compile on another computer because it can't find zlib
+* I want to include zlib in my project
+* It's not currently in my project, rather it's in some directly that's dynamically linked.
+*   zlib.dll is produced as a result. 
+* 
+* zlib copies
+* 1. C:\msys64\home\devon\zlib-1.2.11   size: 2.84 MB
+* 2. C:\msys64\mingw64\include
+* 3. C:\dev\libs\c\zlib                 size: 35.7 MB
+* 
+* Building generates C:\Users\devon\VisualStudio\Png_Image\x64\Release\zlib1.dll
+
+
+delete #1: compiled just fine 
+delete #3: compiled just fine
+delete #2: compiled just fine
+*/

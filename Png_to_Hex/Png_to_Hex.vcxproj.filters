@@ -78,5 +78,6 @@
     <Text Include="notes.txt">
       <Filter>Resource Files</Filter>
     </Text>
+    <Text Include="images\5x2_grayscale_counter.txt" />
   </ItemGroup>
 </Project>

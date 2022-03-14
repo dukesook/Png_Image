@@ -5,9 +5,6 @@
 //#include <unistd.h> //getopt, optarg, optind
 #include <ctype.h> //isprint
 
-#define INPUT_4x3_rows "input/4x3_rows.png"
-#define OUTPUT_4x3_rows "out/4x3_rows.txt"
-
 //LEAF FUNCTIONS - Do not call another function. Lowest Levels of logic
 static bool endsWith(char* word, char* desiredEnd) {
     int wordLength = strlen(word);
@@ -25,32 +22,31 @@ static bool endsWith(char* word, char* desiredEnd) {
     }
 }
 static void printDocumentation() {
-    printf("pngToIcd.exe\n");
+    printf("Png_to_Hex.exe\n");
     printf("ARGUMENTS\n");
     printf("\targ1: input path:  e.g. input/MrCat.png\n");
     printf("\targ2: output path: e.g. out/MrCat.txt (optional)\n");
 
     printf("FLAGS\n");
     printf("\t-s 16: Set Packet Size to 16\n");
-    printf("\t-e:    Little Endian\n");
-    printf("\t-t:    Left Shift Data by 1 byte. Useful if the input image data is 1 byte and 2 byte data is desired\n");
+    //printf("\t-e:    Little Endian\n");
+    //printf("\t-t:    Left Shift Data by 1 byte. Useful if the input image data is 1 byte and 2 byte data is desired\n");
 
     printf("DEFAULT VALUES:\n");
     printf("\tPacket Size: Image width\n");
     printf("\tEndianness: Big Endian\n");
 
     printf("EXAMPLES:\n");
-    printf("\tSimple............pngToIcd.exe  input/MrCat.png\n");
-    printf("\tSpecify output....pngToIcd.exe  input/MrCat.png  output/MrCat.txt\n");
-    printf("\tSet Packet Size...pngToIcd.exe  -s  128 input/MrCat.png  output/MrCat.txt\n");
-    printf("\tLittle Endian.....pngToIcd.exe  -e  input/MrCat.png  output/MrCat.txt\n");
+    printf("\tSimple............HexToIcd.exe  input/MrCat.png\n");
+    printf("\tSpecify output....HexToIcd.exe  input/MrCat.png  output/MrCat.txt\n");
+    printf("\tSet Packet Size...HexToIcd.exe  -s  128 input/MrCat.png  output/MrCat.txt\n");
+    printf("\tLittle Endian.....HexToIcd.exe  -e  input/MrCat.png  output/MrCat.txt\n");
 
     printf("CONSTRAINTS:\n");
     printf("\t-The input image MUST be a .png file.\n");
     printf("\t-Flags must go before all arguments\n");
     printf("\t-Output file must be a .txt file\n");
     printf("\t-Both grayscale and RBG images are handled\n");
-    printf("\t-Images with & without transparent aplpha channels are handled\n");
 
 
 }
@@ -98,8 +94,8 @@ static void printPngArgs(PngImage args) {
     else {
         printf("   Packet Size:.....%d\n", args.packetSize);
     }
-    printf("   littleEndian:....%d\n", args.littleEndian);
-    printf("   leftShiftData:...%d\n", args.leftShiftData);
+    //printf("   littleEndian:....%d\n", args.littleEndian);
+    //printf("   leftShiftData:...%d\n", args.leftShiftData);
 }
 static PngImage initArgs() {
     PngImage args;
