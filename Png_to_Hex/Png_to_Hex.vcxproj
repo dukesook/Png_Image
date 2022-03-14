@@ -152,18 +152,17 @@
     <ClInclude Include="spng.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="4x5.png" />
-    <Image Include="5x2_grayscale_counter.png" />
-    <Image Include="8_bit_images\10w_5h_black.png" />
-    <Image Include="8_bit_images\10w_5h_gradient.png" />
-    <Image Include="8_bit_images\8w_6h_columns.png" />
-    <Image Include="8_bit_images\8w_6h_rgb.png" />
+    <Image Include="16_bit_images\16b_bird.png" />
+    <Image Include="16_bit_images\5x4_rows.png" />
+    <Image Include="8_bit_images\10x5_black.png" />
+    <Image Include="8_bit_images\10x5_gradient.png" />
+    <Image Include="8_bit_images\8x6_columns.png" />
+    <Image Include="8_bit_images\8x6_rgb.png" />
     <Image Include="8_bit_images\Bridge_2560x2160.png" />
     <Image Include="8_bit_images\MrCat.png" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="images\5x2_grayscale_counter.txt" />
-    <Text Include="notes.txt" />
+    <None Include="16_bit_images\16b_5x2_black.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

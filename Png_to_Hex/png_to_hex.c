@@ -7,14 +7,14 @@
 #include <stdio.h>
 
 //COLOR
-static const char* color_type_str(enum spng_color_type color_type) {
+static const char* getColorType(enum spng_color_type color_type) {
     switch (color_type) {
-    case SPNG_COLOR_TYPE_GRAYSCALE: return "grayscale";
-    case SPNG_COLOR_TYPE_TRUECOLOR: return "truecolor";
-    case SPNG_COLOR_TYPE_INDEXED: return "indexed color";
-    case SPNG_COLOR_TYPE_GRAYSCALE_ALPHA: return "grayscale with alpha";
-    case SPNG_COLOR_TYPE_TRUECOLOR_ALPHA: return "truecolor with alpha";
-    default: return "(invalid)";
+        case SPNG_COLOR_TYPE_GRAYSCALE: return "grayscale";
+        case SPNG_COLOR_TYPE_TRUECOLOR: return "RGB";
+        case SPNG_COLOR_TYPE_INDEXED: return "indexed color";
+        case SPNG_COLOR_TYPE_GRAYSCALE_ALPHA: return "grayscale + alpha";
+        case SPNG_COLOR_TYPE_TRUECOLOR_ALPHA: return "RGB + alpha";
+        default: return "(invalid)";
     }
 }
 static int getFormat(struct spng_ihdr ihdr) {
@@ -42,21 +42,6 @@ static unsigned int getChannelCount(uint8_t color_type) {
         exit(1);
     case SPNG_COLOR_TYPE_GRAYSCALE_ALPHA: return 2;
     case SPNG_COLOR_TYPE_TRUECOLOR_ALPHA: return 4;
-    default:
-        printf("ERROR - Unhandled color_type: %x\n", color_type);
-        exit(1);
-    }
-}
-static char* getColorType(uint8_t color_type) {
-    //ihdr.color_type
-    switch (color_type) {
-    case SPNG_COLOR_TYPE_GRAYSCALE: return "grayscale_noAlpha";
-    case SPNG_COLOR_TYPE_TRUECOLOR: return "RGB_noAlpha";
-    case SPNG_COLOR_TYPE_INDEXED:
-        printf("ERROR - Unhandled image: indexed image\n");
-        exit(1);
-    case SPNG_COLOR_TYPE_GRAYSCALE_ALPHA: return "grayscale_Alpha";
-    case SPNG_COLOR_TYPE_TRUECOLOR_ALPHA: return "RGP_ALPHA";
     default:
         printf("ERROR - Unhandled color_type: %x\n", color_type);
         exit(1);
@@ -222,12 +207,17 @@ if(ret)
     }
 }
 static void printHeader(struct spng_ihdr ihdr) {
-    char* color_type = color_type_str(ihdr.color_type);
+    char* color_type = getColorType(ihdr.color_type);
+    unsigned int channelCount = getChannelCount(ihdr.color_type);
+    unsigned int bits_per_pixel = ihdr.bit_depth;
+    unsigned int bit_depth = bits_per_pixel * channelCount; //spng defines "bit_depth" differently than Windows 10
 
-    printf("   Width............%u\n", ihdr.width);
-    printf("   Height...........%u\n", ihdr.height);
-    printf("   Bit Depth........%u\n", ihdr.bit_depth);
+    printf("   Pixel Width......%u\n", ihdr.width);
+    printf("   Pixel Height.....%u\n", ihdr.height);
     printf("   Color Type.......%s\n", color_type);
+    printf("   Bits/pixel.......%u\n", bits_per_pixel);
+    printf("   Channel Count....%d\n", channelCount);
+    printf("   Bit Depth........%d\n", bit_depth);
 }
 
 //PNG OPERATIONS
@@ -296,6 +286,8 @@ static PngImage removeAlphaChannel(PngImage png) {
 }
 static PngImage PngImage_toGray(PngImage png) {
 
+    printf("    Converting to grayscale...\n");
+
     //VARIABLES
     unsigned int width = png.width_pixels;
     unsigned int height = png.height_pixels;
@@ -303,7 +295,7 @@ static PngImage PngImage_toGray(PngImage png) {
     unsigned char* img = png.data;
     int gray_channels = (channels == 4) ? 2 : 1;
     size_t img_size = (width * height * channels * png.bytes_per_channel);
-    size_t gray_img_size = width * height * gray_channels;
+    size_t gray_img_size = width * height * gray_channels * png.bytes_per_channel;
 
 
     if (png.channels == 1) {
@@ -320,27 +312,57 @@ static PngImage PngImage_toGray(PngImage png) {
 
     //p - input image
     //pg - output image
-    unsigned char red, green, blue;
-    uint8_t grayValue;
-    for (unsigned char* p = img, *pg = gray_img; p != img + img_size; p += channels, pg += gray_channels) {
-        red = *p;
-        green = *(p + 1);
-        blue = *(p + 2);
-        grayValue = (uint8_t)((red + green + blue) / 3.0);
-        *pg = grayValue;
+    if (png.bytes_per_channel == 1) {
+        unsigned char red, green, blue;
+        unsigned char grayValue;
+        for (unsigned char* p = img, *pg = gray_img; p != img + img_size; p += channels, pg += gray_channels) {
+            red = *p;
+            green = *(p + 1);
+            blue = *(p + 2);
+            grayValue = (unsigned char)((red + green + blue) / 3.0);
+            *pg = grayValue;
 
-        //printf("%02x %02x %02x = %02x\n", red, green, blue, grayValue);
-        if (channels == 4) {
-            *(pg + 1) = *(p + 3);
+            //printf("%02x %02x %02x = %02x\n", red, green, blue, grayValue);
+            if (channels == 4) {
+                *(pg + 1) = *(p + 3);
+            }
         }
+        PngImage png_gray = png;
+        png_gray.data = gray_img;
+        png_gray.image_size_bytes = png.image_size_pixels * png.bytes_per_channel;
+        png_gray.color_type = "grayscale_noAlpha";
+        png_gray.channels = gray_channels;
+        printf("   -Converted to Gray-Scale\n");
+        return png_gray;
     }
-    PngImage png_gray = png;
-    png_gray.data = gray_img;
-    png_gray.image_size_bytes = png.image_size_pixels * png.bytes_per_channel;
-    png_gray.color_type = "grayscale_noAlpha";
-    png_gray.channels = gray_channels;
-    printf("   -Converted to Gray-Scale\n");
-    return png_gray;
+    else if (png.bytes_per_channel == 2) {
+        uint16_t red, green, blue;
+        uint16_t grayValue;
+        for (uint16_t* p = img, *pg = gray_img; p != img + img_size; p += channels, pg += gray_channels) {
+            red = *p;
+            green = *(p + 1);
+            blue = *(p + 2);
+            grayValue = (uint16_t)((red + green + blue) / 3.0);
+            *pg = grayValue;
+
+            //printf("%02x %02x %02x = %02x\n", red, green, blue, grayValue);
+            if (channels == 4) {
+                *(pg + 1) = *(p + 3);
+            }
+        }
+        PngImage png_gray = png;
+        png_gray.data = gray_img;
+        png_gray.image_size_bytes = png.image_size_pixels * png.bytes_per_channel;
+        png_gray.color_type = "grayscale_noAlpha";
+        png_gray.channels = gray_channels;
+        printf("   -Converted to Gray-Scale\n");
+        return png_gray;
+    }
+    else {
+        printf("ERROR - unhandled bytes_per_channel: %d\n", png.bytes_per_channel);
+        exit(1);
+    }
+
 }
 static PngImage readImage(PngImage png) {
 
