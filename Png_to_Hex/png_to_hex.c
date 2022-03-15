@@ -412,21 +412,30 @@ static PngImage readImage(PngImage png) {
 }
 
 //TO TXT
-static void writeByte(uint8_t x, FILE* output) {
-    fprintf(output, "%02x ", x);
+static void writeByte(uint8_t x, FILE* output_fp) {
+    fprintf(output_fp, "%02x ", x);
+}
+static void writePixel(FILE* output_fp, unsigned char** byte, unsigned int bytes_per_channel) {
+    if (bytes_per_channel == 1) {
+        writeByte(0, output_fp);
+        writeByte(**byte, output_fp);
+        (*byte)++;
+    } else if (bytes_per_channel == 2) {
+        writeByte(**byte, output_fp);
+        (*byte)++;
+        writeByte(**byte, output_fp);
+        (*byte)++;
+    } else {
+        printf("ERROR - Unhandled bytes_per_channel count: %d\n", bytes_per_channel);
+        exit(1);
+    }
 }
 static void writeSinglePacket(unsigned int* remainingPixels, FILE* output_fp, unsigned char** byte, unsigned int bytes_per_channel, unsigned int packetSize_pixels) {
     
     for (int i = 0; i < packetSize_pixels; i++) {
-        writeByte(**byte, output_fp);
-        (*byte)++;
-        if (bytes_per_channel == 2) {
-            writeByte(**byte, output_fp);
-            (*byte)++;
-        }
+        writePixel(output_fp, byte, bytes_per_channel);
         (*remainingPixels)--;
     }
-
     fprintf(output_fp, "\n");
 }
 static void png_to_txt(PngImage png) {
@@ -503,14 +512,17 @@ static void printImage(PngImage png) {
             printf("\n");
         }
     }
-    else {
+    else if (channels == GRAYSCALE && bytes_per_channel == 1) {
         for (unsigned int row = 0; row < (png.height_pixels); row++) {
             for (unsigned int col = 0; col < byteWidth; col++) {
                 offset = col + (row * byteWidth);
-                printf("%02x ", *(image + offset));
+                printf("(%02x) ", *(image + offset));
             }
             printf("\n");
         }
+    }
+    else {
+        printf("ERROR - Cannot print image: channels count: %d. bytes_per_channel: %d\n", channels, bytes_per_channel);
     }
 }
 
@@ -559,3 +571,7 @@ delete #1: compiled just fine
 delete #3: compiled just fine
 delete #2: compiled just fine
 */
+
+
+
+
