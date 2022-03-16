@@ -1,8 +1,8 @@
 #include "commandLineHandler.h"
 
-
 #include "getopt.h"
 //#include <unistd.h> //getopt, optarg, optind
+#include <io.h> //getopt, optarg, optind
 #include <ctype.h> //isprint
 
 //LEAF FUNCTIONS - Do not call another function. Lowest Levels of logic
@@ -29,22 +29,23 @@ static void printDocumentation() {
 
     printf("FLAGS\n");
     printf("\t-s 16: Set Packet Size to 16\n");
-    //printf("\t-e:    Little Endian\n");
+    printf("\t-e:    Little Endian\n");
+    printf("\t-i:    Includes ICD Camera Packet Meta Data: (66 xx xx yy yy ss ss) \n");
     //printf("\t-t:    Left Shift Data by 1 byte. Useful if the input image data is 1 byte and 2 byte data is desired\n");
-
+      
     //printf("DEFAULT VALUES:\n");
     //printf("\tPacket Size: Image width\n");
     //printf("\tEndianness: Big Endian\n");
 
     printf("EXAMPLES:\n");
-    printf("\tSimple............HexToIcd.exe  input/MrCat.png\n");
-    printf("\tSpecify output....HexToIcd.exe  input/MrCat.png  output/MrCat.txt\n");
-    printf("\tSet Packet Size...HexToIcd.exe  -s  128 input/MrCat.png  output/MrCat.txt\n");
+    printf("\tSimple............$ HexToIcd.exe  input/MrCat.png\n");
+    printf("\tSpecify output....$ HexToIcd.exe  input/MrCat.png  output/MrCat.txt\n");
+    printf("\tSet Packet Size...$ HexToIcd.exe  -s  128 input/MrCat.png  output/MrCat.txt\n");
 
     printf("CONSTRAINTS:\n");
     printf("\t-The input image MUST be a .png file.\n");
-    printf("\t-Flags must go before all arguments\n");
     printf("\t-Output file must be a .txt file\n");
+    printf("\t-Flags must go before all arguments\n");
     printf("\t-Both grayscale and RBG images are handled\n");
 
 
@@ -87,11 +88,11 @@ static void printPngArgs(PngImage args) {
     printf("SETTINGS\n");
     printf("   input............%s\n", args.input);
     printf("   output:..........%s\n", args.output);
-    if (args.packetSize == 0) {
+    if (args.packet_pixel_count == 0) {
         printf("   Packet Size:.....Not specified, default to image width\n");
     }
     else {
-        printf("   Packet Size:.....%d\n", args.packetSize);
+        printf("   Packet Size:.....%d\n", args.packet_pixel_count);
     }
     //printf("   littleEndian:....%d\n", args.littleEndian);
     //printf("   leftShiftData:...%d\n", args.leftShiftData);
@@ -100,9 +101,9 @@ static PngImage initArgs() {
     PngImage args;
     args.input = NULL;
     args.output = NULL;
-    args.packetSize = 0;
+    args.packet_pixel_count = 0;
     args.littleEndian = false;
-    args.leftShiftData = false;
+    args.icd = false;
     return args;
 }
 static PngImage extractArgs(int argc, char* argv[]) {
@@ -111,16 +112,19 @@ static PngImage extractArgs(int argc, char* argv[]) {
 
     int c;
     //SET OPTIONS
-    while ((c = getopt(argc, argv, "ets:")) != -1) {
+    while ((c = getopt(argc, argv, "ets:i")) != -1) {
         switch (c) {
         case 'e':
             args.littleEndian = true;
             break;
-        case 't':
-            args.leftShiftData = true;
-            break;
+        //case 't':
+        //    args.leftShiftData = true;
+        //    break;
         case 's':
-            args.packetSize = atoi(optarg);
+            args.packet_pixel_count = atoi(optarg);
+            break;
+        case 'i':
+            args.icd = true;
             break;
         case '?':
             if (optopt == 's') {
@@ -184,7 +188,7 @@ static void validateArgs(PngImage* args) {
     }
 
     //PACKET SIZE
-    if (args->packetSize < 0) {
+    if (args->packet_pixel_count < 0) {
         printf("ERROR - Packet Size: %s\n", args->output);
         printf(".....The Packet Size must be a positive\n");
         printDocumentation();

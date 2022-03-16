@@ -5,8 +5,11 @@ Png_to_Hex.exe
 
 -s FLAG
 	Specifies the number of pixels in each packet.
+	Expects a decimal number.
 	Packets are separated by \n
-	Without the -s flag, the packet size defaults to the image width
+	Without the -s flag, the packet size defaults to the image width.
+
+-i FLAG
 
 EXAMPLE
 	$ Png_to_Hex image.png

@@ -1,6 +1,6 @@
 
 #include "CommandLineHandler.h"
-//#include "getopt.h"
+#include "getopt.h"
 #include <unistd.h> //getopt, optarg, optind
 #include <ctype.h> //isprint
 

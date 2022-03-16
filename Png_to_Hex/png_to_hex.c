@@ -402,8 +402,8 @@ static PngImage readImage(PngImage png) {
     png.bytes_per_channel = (ihdr.bit_depth == 8) ? 1 : 2;
     png.color_type = getColorType(ihdr.color_type);
     png.channels = getChannelCount(ihdr.color_type);
-    size_t packetSize_pixels = png.packetSize == 0 ? png.width_pixels : png.packetSize;
-    png.packetSize = packetSize_pixels;
+    size_t packetSize_pixels = png.packet_pixel_count == 0 ? png.width_pixels : png.packet_pixel_count;
+    png.packet_pixel_count = packetSize_pixels;
 
     printf("   Image read successful\n");
     printHeader(ihdr);
@@ -412,42 +412,119 @@ static PngImage readImage(PngImage png) {
 }
 
 //TO TXT
+static void nextPixel(unsigned int* x, unsigned int* y, unsigned int width) {
+    int lastX = (width - 1);
+    if (*x == lastX) { //if you reached the end of a row
+        *x = 0; //go to the next row
+        (*y)++;
+    }
+    else {
+        (*x)++;
+    }
+}
 static void writeByte(uint8_t x, FILE* output_fp) {
     fprintf(output_fp, "%02x ", x);
 }
-static void writePixel(FILE* output_fp, unsigned char** byte, unsigned int bytes_per_channel) {
+static void write_icd_eof(FILE* output) {
+    //use for icd camera
+    char* eof = "66 FF FF FF FF 00 00\n";
+    fprintf(output, "%s", eof);
+}
+static void writeShort(uint16_t x, FILE* output_fp, bool littleEndian) {
+    
+    //VARIABLES
+    unsigned char* ptr = (unsigned char*)&x;
+    unsigned char bigEnd; //the most significant byte
+    unsigned char littleEnd; //the least significant byte
+
+    //PORTABILITY - this program was orignally compiled on an intel processor, which is little endian.
+    //bigEnd = ptr[0];    //for little endian systems, the msb is on the right most side
+    //littleEnd = ptr[1]; //for little endian systems, the lsb is on the left most side
+
+    littleEnd = x & 0xff;
+    bigEnd = (x >> 8) & 0xff;
+
+    if (littleEndian) { //LITTLE ENDIAN
+        writeByte(littleEnd, output_fp);
+        writeByte(bigEnd, output_fp);
+    }
+    else { //BIG ENDIAN
+        writeByte(bigEnd, output_fp);
+        writeByte(littleEnd, output_fp);
+    }
+
+}
+
+static void writePixel(FILE* output_fp, unsigned char** byte, unsigned int bytes_per_channel, bool littleEndian) {
     if (bytes_per_channel == 1) {
-        writeByte(0, output_fp);
-        writeByte(**byte, output_fp);
+        if (littleEndian) {
+            writeByte(**byte, output_fp);
+            writeByte(0, output_fp);
+        }
+        else {
+            writeByte(0, output_fp);
+            writeByte(**byte, output_fp);
+        }
         (*byte)++;
-    } else if (bytes_per_channel == 2) {
-        writeByte(**byte, output_fp);
+
+    } else if (bytes_per_channel == 2) { 
+        //this code was originally compiled on an intel processor, which is by little endian.
+        unsigned char littleEnd = **byte; 
         (*byte)++;
-        writeByte(**byte, output_fp);
+        unsigned char bigEnd = **byte;
         (*byte)++;
+        if (littleEndian) { //LITTLE ENDIAN
+            writeByte(littleEnd, output_fp);
+            writeByte(bigEnd, output_fp);
+        } else { //BIG ENDIAN
+            writeByte(bigEnd, output_fp);
+            writeByte(littleEnd, output_fp);
+        }
     } else {
         printf("ERROR - Unhandled bytes_per_channel count: %d\n", bytes_per_channel);
         exit(1);
     }
 }
-static void writeSinglePacket(unsigned int* remainingPixels, FILE* output_fp, unsigned char** byte, unsigned int bytes_per_channel, unsigned int packetSize_pixels) {
-    
-    for (int i = 0; i < packetSize_pixels; i++) {
-        writePixel(output_fp, byte, bytes_per_channel);
-        (*remainingPixels)--;
+static void write_icd_header(uint16_t x, uint16_t y, uint16_t packetSize, FILE* output, bool littleEndian) {
+
+    //PRINT 66
+    fprintf(output, "66 ");
+
+    //PRINT X
+    writeShort(x, output, littleEndian);
+
+    //PRINT Y
+    writeShort(y, output, littleEndian);
+
+    //PRINT COUNT
+    writeShort(packetSize, output, littleEndian);
+
+}
+static void writeSinglePacket(unsigned int* remainingPixels, FILE* output_fp, unsigned char** byte, 
+     unsigned int packetSize_pixels, unsigned int* x, unsigned int* y, PngImage png) {
+
+    //VARIABLES
+    unsigned int image_width_pixels = png.width_pixels;
+    unsigned int bytes_per_channel = png.bytes_per_channel;
+    bool includeIcdHeader = png.icd;
+    bool littleEndian = png.littleEndian;
+
+    if (includeIcdHeader)
+        write_icd_header(*x, *y, packetSize_pixels, output_fp, littleEndian);
+
+    for (int i = 0; i < packetSize_pixels; i++, (*remainingPixels)--) {
+        writePixel(output_fp, byte, bytes_per_channel, littleEndian);
+        nextPixel(x, y, image_width_pixels);
     }
     fprintf(output_fp, "\n");
 }
 static void png_to_txt(PngImage png) {
 
     //VARIABLES
-    unsigned int packetSize_pixels = png.packetSize;
-    unsigned int bytes_per_channel = png.bytes_per_channel;
-    unsigned int packetSize_bytes = packetSize_pixels * bytes_per_channel;
-    unsigned int width = png.width_pixels;
-    unsigned int height = png.height_pixels;
-    unsigned int remainingPixels = (width * height);
-    unsigned char* baseAddress = png.data;
+    unsigned int x = 0;
+    unsigned int y = 0;
+    unsigned int packetSize_pixels = png.packet_pixel_count;
+    unsigned int remainingPixels = (png.width_pixels * png.height_pixels);
     unsigned char* currentByte = png.data;
     FILE* output_fp;
 
@@ -456,14 +533,19 @@ static void png_to_txt(PngImage png) {
         printf("ERROR - failed to open: %s\n", png.output);
         exit(1);
     }
-      
+    
+    //WRITE DATA
     while (packetSize_pixels <= remainingPixels) {
-        writeSinglePacket(&remainingPixels, output_fp, &currentByte, bytes_per_channel, packetSize_pixels);
+        writeSinglePacket(&remainingPixels, output_fp, &currentByte, packetSize_pixels, &x, &y, png);
     }
      
     //LAST PACKET - remaining pixels
     if (remainingPixels > 0) {
-        writeSinglePacket(&remainingPixels, output_fp, &currentByte, bytes_per_channel, remainingPixels);
+        writeSinglePacket(&remainingPixels, output_fp, &currentByte, remainingPixels, &x, &y, png);
+    }
+
+    if (png.icd) {
+        write_icd_eof(output_fp);
     }
 
     printf("SUCCESS\n   .png converted to .txt\n");
@@ -481,8 +563,9 @@ static void printImage(PngImage png) {
     unsigned int pixelSize = channels * bytes_per_channel;
     unsigned char* image = png.data;
 #define GRAYSCALE 1
+#define RGB 3
     //PRINT IMAGE
-    if (channels == 3 && bytes_per_channel == 1) {
+    if (channels == RGB && bytes_per_channel == 1) {
         for (unsigned int row = 0; row < (png.height_pixels); row++) {
             for (unsigned int pix = 0; pix < byteWidth; pix += pixelSize) {
                 offset = pix + (row * byteWidth);
@@ -491,7 +574,7 @@ static void printImage(PngImage png) {
             printf("\n");
         }
     } 
-    else if (channels == 3 && bytes_per_channel == 2) {
+    else if (channels == RGB && bytes_per_channel == 2) {
         for (unsigned int row = 0; row < (png.height_pixels); row++) {
             for (unsigned int pix = 0; pix < byteWidth; pix += pixelSize) {
                 offset = pix + (row * byteWidth);
