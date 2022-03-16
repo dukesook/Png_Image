@@ -1,0 +1,96 @@
+Comparing files KEY\8b_8x6_columns.txt and OUTPUT\8B_8X6_COLUMNS.TXT
+FC: no differences encountered
+
+Comparing files KEY\8b_8x6_rgb.txt and OUTPUT\8B_8X6_RGB.TXT
+FC: no differences encountered
+
+Comparing files KEY\8b_10x5_black.txt and OUTPUT\8B_10X5_BLACK.TXT
+FC: no differences encountered
+
+Comparing files KEY\8b_10x5_gradient.txt and OUTPUT\8B_10X5_GRADIENT.TXT
+FC: no differences encountered
+
+Comparing files KEY\16b_5x3_blue.txt and OUTPUT\16B_5X3_BLUE.TXT
+FC: no differences encountered
+
+Comparing files KEY\16b_5x4_rows.txt and OUTPUT\16B_5X4_ROWS.TXT
+FC: no differences encountered
+
+Comparing files KEY\16b_16x2_gray_counter.txt and OUTPUT\16B_16X2_GRAY_COUNTER.TXT
+FC: no differences encountered
+
+Comparing files KEY\16b_16x2_rgb_counter.txt and OUTPUT\16B_16X2_RGB_COUNTER.TXT
+FC: no differences encountered
+
+Comparing files KEY\16b_bird.txt and OUTPUT\16B_BIRD.TXT
+FC: no differences encountered
+
+Comparing files KEY\16b_gradient.txt and OUTPUT\16B_GRADIENT.TXT
+FC: no differences encountered
+
+Comparing files KEY\16b_grayscale.txt and OUTPUT\16B_GRAYSCALE.TXT
+FC: no differences encountered
+
+Comparing files OUTPUT\8b_sFlag1.txt and KEY\8B_SFLAG1.TXT
+FC: no differences encountered
+
+Comparing files OUTPUT\8b_sFlag5.txt and KEY\8B_SFLAG5.TXT
+FC: no differences encountered
+
+Comparing files OUTPUT\8b_sFlag17.txt and KEY\8B_SFLAG17.TXT
+FC: no differences encountered
+
+Comparing files OUTPUT\8b_sFlag60.txt and KEY\8B_SFLAG60.TXT
+FC: no differences encountered
+
+Comparing files OUTPUT\16b_sFlag1.txt and KEY\16B_SFLAG1.TXT
+FC: no differences encountered
+
+Comparing files OUTPUT\16b_sFlag5.txt and KEY\16B_SFLAG5.TXT
+FC: no differences encountered
+
+Comparing files OUTPUT\16b_sFlag17.txt and KEY\16B_SFLAG17.TXT
+FC: no differences encountered
+
+Comparing files OUTPUT\16b_sFlag60.txt and KEY\16B_SFLAG60.TXT
+FC: no differences encountered
+
+Comparing files KEY\16b_sFlag0_iFlag.txt and OUTPUT\16B_SFLAG0_IFLAG.TXT
+FC: no differences encountered
+
+Comparing files KEY\16b_sFlag1_iFlag.txt and OUTPUT\16B_SFLAG1_IFLAG.TXT
+FC: no differences encountered
+
+Comparing files KEY\16b_sFlag3_iFlag.txt and OUTPUT\16B_SFLAG3_IFLAG.TXT
+FC: no differences encountered
+
+Comparing files KEY\16b_sFlag40_iFlag.txt and OUTPUT\16B_SFLAG40_IFLAG.TXT
+FC: no differences encountered
+
+Comparing files KEY\8b_sFlag0_iFlag.txt and OUTPUT\8B_SFLAG0_IFLAG.TXT
+FC: no differences encountered
+
+Comparing files KEY\8b_sFlag1_iFlag.txt and OUTPUT\8B_SFLAG1_IFLAG.TXT
+FC: no differences encountered
+
+Comparing files KEY\8b_sFlag3_iFlag.txt and OUTPUT\8B_SFLAG3_IFLAG.TXT
+FC: no differences encountered
+
+Comparing files KEY\8b_sFlag40_iFlag.txt and OUTPUT\8B_SFLAG40_IFLAG.TXT
+FC: no differences encountered
+
+Comparing files KEY\8b_8x6_columns_eFlag.txt and OUTPUT\8B_8X6_COLUMNS_EFLAG.TXT
+FC: no differences encountered
+
+Comparing files KEY\16b_16x2_rgb_counter_eFlag.txt and OUTPUT\16B_16X2_RGB_COUNTER_EFLAG.TXT
+FC: no differences encountered
+
+Comparing files KEY\8b_8x6_columns_eFlag_iFlag.txt and OUTPUT\8B_8X6_COLUMNS_EFLAG_IFLAG.TXT
+FC: no differences encountered
+
+Comparing files KEY\16b_16x2_rgb_counter_eFlag_iFlag.txt and OUTPUT\16B_16X2_RGB_COUNTER_EFLAG_IFLAG.TXT
+FC: no differences encountered
+
+Comparing files KEY\16b_5x3_blue_eFlag_iFlag.txt and OUTPUT\16B_5X3_BLUE_EFLAG_IFLAG.TXT
+FC: no differences encountered
+
